@@ -1,28 +1,40 @@
 import { createContext, useEffect, useState } from 'react'
-import { tasks as data } from '../data/tasks'
+import { fetchTasks, createOneTask, deleteOneTask } from '../data/tasks'
 
 export const TaskContext = createContext()
 
+
 export function TaskContextProvider(props) {
   const [tasks, setTasks] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  function createTask(task) {
-    setTasks([
-      ...tasks,
-      {
-        title: task.title,
-        id: tasks.length,
-        description: task.description,
-      },
-    ])
+
+
+  const createTask = async (task) => {
+    const newTask = await createOneTask(task)
+    setTasks([...tasks, newTask])
   }
 
-  function deleteTask(taskId) {
+  const deleteTask = async (taskId) => {
+    await deleteOneTask(taskId)
     setTasks(tasks.filter((task) => task.id !== taskId))
   }
 
+  const loadTasks = async () => {
+    try {
+      const taskData = await fetchTasks()
+      setTasks(taskData)
+      setLoading(false)
+    } catch (error) {
+      console.error('Error al cargar las tareas:', error)
+      setTasks([])
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    setTasks(data)
+    console.log("useEfffect context");
+    loadTasks()
   }, [])
 
   return (
@@ -31,6 +43,7 @@ export function TaskContextProvider(props) {
         tasks,
         createTask,
         deleteTask,
+        loading,
       }}
     >
       {props.children}

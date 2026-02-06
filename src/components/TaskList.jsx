@@ -3,7 +3,13 @@ import { TaskContext } from '../context/TaskContext'
 import TaskCard from './TaskCard'
 
 function TaskList() {
-  const { tasks } = useContext(TaskContext)
+  const { tasks, loading } = useContext(TaskContext)
+
+  console.log(tasks);
+
+  if (loading) {
+    return <h1 className='text-white text-4xl font-bold text-center'>Cargando...</h1>
+  }
 
   if (tasks.length === 0) {
     return (
